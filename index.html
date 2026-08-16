@@ -99,15 +99,23 @@ textarea{min-height:86px;resize:vertical}
   width:52px;height:52px;font-size:23px;font-weight:900;color:#5a4b3e}
 .num button:active{background:#f3ece1}
 
+.picked{background:#fff7dc;border:2px solid #f0d79a;border-radius:14px;padding:14px;
+  font-weight:800;line-height:1.6;margin-top:6px}
+.pickednote{font-size:13px;font-weight:700;color:var(--muted);margin-top:5px}
 .qbox{background:#fff7dc;border-radius:18px;padding:16px;margin:12px 0}
 .qbox .lab{font-size:12px;font-weight:900;color:#a06b28;letter-spacing:.08em}
 .qbox .info{font-weight:800;font-size:17px;line-height:1.6;margin:6px 0 10px}
 .qbox .q{font-size:19px;font-weight:900;line-height:1.55}
 
-.bars{display:grid;gap:8px;margin-top:12px}
-.bar{display:grid;grid-template-columns:130px 1fr 46px;align-items:center;gap:9px;font-size:15px;font-weight:800}
-.bar .track{background:#ece5db;border-radius:9px;height:18px;overflow:hidden}
-.bar .fill{height:100%;background:var(--accent)}
+.bars{display:grid;gap:10px;margin-top:12px}
+.bar{display:grid;grid-template-columns:132px 1fr 46px;align-items:center;gap:9px;font-size:15px;font-weight:800}
+.bar .track{display:grid;gap:3px;height:30px}
+.cell{background:#ece5db;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;color:#b3a89c}
+.cell.fill{color:#fff}
+.track.dense .cell{font-size:0}
+.scale{display:grid;gap:3px;margin:0 0 2px 141px;font-size:11px;color:var(--muted);font-weight:800}
+.scale span{text-align:center}
 
 .choice2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
 .choice2 button{
@@ -171,17 +179,17 @@ textarea{min-height:86px;resize:vertical}
 
 <main class="shell">
   <nav class="nav">
-    <button id="t0" data-go="0"><span class="n">じゅんび</span>入力</button>
-    <button id="t1" data-go="1"><span class="n">① 本時</span>ふりかえる</button>
-    <button id="t2" data-go="2"><span class="n">② 本時</span>えらび直す</button>
-    <button id="t3" data-go="3"><span class="n">③ 本時</span>くらべる</button>
+    <button id="t0" data-go="0"><span class="n">・</span>じゅんび</button>
+    <button id="t1" data-go="1"><span class="n">①</span>ふりかえる</button>
+    <button id="t2" data-go="2"><span class="n">②</span>えらび直す</button>
+    <button id="t3" data-go="3"><span class="n">③</span>くらべる</button>
   </nav>
 
   <!-- ===== じゅんび ===== -->
   <section id="p0" class="panel on">
-    <div class="kicker">じゅんび（前の時間に５分）</div>
-    <h2>ロイロの記録を うつそう</h2>
-    <p class="lead">本時までに、ここまで入れておきます。本時は「えらび直す」ことだけに集中できます。</p>
+    <div class="kicker">じゅんび</div>
+    <h2>ロイロの きろくを うつそう</h2>
+    <p class="lead">ロイロに ある じぶんの きろくを、ここに うつして おこう。<br>これが そろうと、あとで くらべられるよ。</p>
 
     <div class="row2">
       <label>出席番号
@@ -217,7 +225,7 @@ textarea{min-height:86px;resize:vertical}
 
   <!-- ===== ① ふりかえる ===== -->
   <section id="p1" class="panel">
-    <div class="kicker">STEP 1</div>
+    <div class="kicker">①</div>
     <h2>🔎 ともだちの はんのうを 見よう</h2>
     <div id="firstView"></div>
     <div id="firstBars"></div>
@@ -229,7 +237,7 @@ textarea{min-height:86px;resize:vertical}
 
   <!-- ===== ② えらび直す ===== -->
   <section id="p2" class="panel">
-    <div class="kicker">STEP 2</div>
+    <div class="kicker">②</div>
     <h2>💡 つかう ひみつを えらび直そう</h2>
     <p class="lead">「☝️ つかむ」を おしたまま 指で うごかして、ならべかえよう。</p>
 
@@ -258,6 +266,7 @@ textarea{min-height:86px;resize:vertical}
     <div id="afterChoice" hidden>
       <h3>いま つかう ひみつ</h3>
       <select id="selNow"></select>
+      <div id="keepBox" hidden></div>
       <h3>あたらしい もんだい</h3>
       <textarea id="inQ2" maxlength="120" placeholder="れい：どんぐりのぼうしを何というでしょう？"></textarea>
       <div class="btnrow"><button class="btn p" id="btnSaveNow">これで きめた</button></div>
@@ -270,7 +279,7 @@ textarea{min-height:86px;resize:vertical}
 
   <!-- ===== ③ くらべる ===== -->
   <section id="p3" class="panel">
-    <div class="kicker">STEP 3</div>
+    <div class="kicker">③</div>
     <h2>✨ さいしょと いま</h2>
     <div id="shot"></div>
 
@@ -279,7 +288,6 @@ textarea{min-height:86px;resize:vertical}
     </label>
     <div class="btnrow">
       <button class="btn p" id="btnSaveReason">ふりかえりを ほぞん</button>
-      <button class="btn s" id="btnPrint">🖨 いんさつ／PDF</button>
     </div>
     <div id="doneMsg"></div>
 
@@ -472,13 +480,33 @@ function ready() {
 }
 
 /* ===== ① ふりかえる ===== */
+var COLOR = { correct: "#6fae53", easy: "#9aa7b4", good: "#efb23a", hard: "#e0776a", wow: "#7b6ad0" };
+
+/* 人数ぶんの マスを ならべた 数直線 */
+function numberLine(n, total, color) {
+  var cols = "grid-template-columns:repeat(" + total + ",1fr)";
+  var dense = total > 12 ? " dense" : "";
+  var cells = "";
+  for (var i = 1; i <= total; i++) {
+    cells += '<span class="cell' + (i <= n ? " fill" : "") + '"' +
+      (i <= n ? ' style="background:' + color + '"' : "") + ">" + i + "</span>";
+  }
+  return '<span class="track' + dense + '" style="' + cols + '">' + cells + "</span>";
+}
+
 function bars(react) {
   var total = react.total || 0;
-  return '<div class="bars">' + FB.filter(function (f) { return f.k !== "total"; }).map(function (f) {
+  if (!total) return "";
+  var scale = "";
+  if (total <= 12) {
+    var s = "";
+    for (var i = 1; i <= total; i++) s += "<span>" + i + "</span>";
+    scale = '<div class="scale" style="grid-template-columns:repeat(' + total + ',1fr)">' + s + "</div>";
+  }
+  return scale + '<div class="bars">' + FB.filter(function (f) { return f.k !== "total"; }).map(function (f) {
     var n = react[f.k] || 0;
-    var w = total ? Math.round(n / total * 100) : 0;
-    return '<div class="bar"><span>' + f.em + " " + f.label + '</span>' +
-      '<span class="track"><span class="fill" style="width:' + w + '%"></span></span>' +
+    return '<div class="bar"><span>' + f.em + " " + f.label + "</span>" +
+      numberLine(n, total, COLOR[f.k] || "#efb23a") +
       "<span>" + n + "人</span></div>";
   }).join("") + "</div>";
 }
@@ -525,10 +553,21 @@ function renderChoice() {
   $("btnChange").classList.toggle("on", data.keep === false);
   $("btnKeep").classList.toggle("on", data.keep === true);
   $("afterChoice").hidden = data.keep === null;
-  if (data.keep !== null) {
-    $("inQ2").value = data.nowQ || "";
-    $("selNow").disabled = data.keep === true;
-    if (data.keep === true) { data.nowInfoId = data.firstInfoId; renderNowSelect(); }
+  if (data.keep === null) return;
+
+  $("inQ2").value = data.nowQ || "";
+
+  if (data.keep === true) {
+    // ひみつは かえない → さいしょの ひみつを そのまま見せる
+    data.nowInfoId = data.firstInfoId;
+    $("selNow").hidden = true;
+    $("keepBox").hidden = false;
+    $("keepBox").innerHTML = '<div class="picked">' + esc(infoText(data.firstInfoId)) +
+      '<div class="pickednote">この ひみつは かえません</div></div>';
+  } else {
+    $("selNow").hidden = false;
+    $("keepBox").hidden = true;
+    renderNowSelect();
   }
 }
 function setKeep(v) {
@@ -537,7 +576,9 @@ function setKeep(v) {
   save(); renderChoice(); renderZones();
 }
 function saveNow() {
-  data.nowInfoId = $("selNow").value || data.firstInfoId;
+  data.nowInfoId = data.keep === true
+    ? data.firstInfoId
+    : ($("selNow").value || data.firstInfoId);
   data.nowQ = $("inQ2").value.trim();
   if (!data.nowQ) { toast("あたらしい もんだいを 書いてね"); return; }
   save(); renderZones(); marks();
@@ -665,8 +706,21 @@ function bind() {
   $("btnSaveNow2").addEventListener("click", function () {
     save(); renderCompare(); toast("ほぞん したよ");
   });
-  $("btnPrint").addEventListener("click", function () { window.print(); });
   $("btnReset").addEventListener("click", resetAll);
+  // 書きかけでも消えないように、打つたびに ほぞんする
+  $("inQ2").addEventListener("input", function (e) {
+    data.nowQ = e.target.value;
+    save();
+  });
+  $("selNow").addEventListener("change", function () {
+    data.nowInfoId = $("selNow").value || data.firstInfoId;
+    save();
+    renderZones();
+  });
+  $("inReason").addEventListener("input", function (e) {
+    data.reason = e.target.value;
+    save();
+  });
   ["inNo", "inTopic", "inQ"].forEach(function (id) {
     $(id).addEventListener("change", readSetup);
   });
