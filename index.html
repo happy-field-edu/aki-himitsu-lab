@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff8e8">
+<title>秋のひみつ研究所</title>
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+:root{
+  --ink:#3e342a;--muted:#74695f;--line:#eadfca;--accent:#ef9c32;--accent2:#ffd883;
+  --top:#fff0be;--mid:#e8f2db;--bot:#eeeef1;--shadow:0 8px 24px rgba(84,62,34,.08)
+}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+  color:var(--ink);font-size:17px;line-height:1.7;
+  background:linear-gradient(180deg,#fffaf0 0,#fff7e6 100%);min-height:100vh
+}
+button,input,textarea,select{font-family:inherit;font-size:17px}
+button{touch-action:manipulation;-webkit-appearance:none;-webkit-user-select:none;user-select:none;cursor:pointer}
+
+.app-header{
+  position:sticky;top:0;z-index:40;background:rgba(255,253,248,.95);
+  border-bottom:1px solid var(--line);padding:11px 16px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap
+}
+.app-header h1{margin:0;font-size:20px}
+.app-header .eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;color:#a06b28}
+.badge{margin-left:auto;display:flex;align-items:center;gap:8px}
+.badge .who{background:#ffeecb;border-radius:999px;padding:7px 13px;font-size:14px;font-weight:800}
+.badge button{background:#f2ece3;border:0;border-radius:999px;padding:9px 13px;font-size:13px;color:#7a6d61}
+
+.shell{max-width:900px;margin:0 auto;padding:16px 16px 70px}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px}
+.nav button{
+  border:0;border-radius:15px;background:#eee8dd;color:#7a6d61;padding:11px 4px;
+  font-weight:800;font-size:14px;min-height:54px;line-height:1.35
+}
+.nav button .n{display:block;font-size:11px;opacity:.75}
+.nav button.on{background:var(--accent2);color:#4b371d}
+.nav button.done{background:#dfeeda;color:#4c6b3c}
+
+.panel{display:none;background:rgba(255,255,255,.93);border:1px solid var(--line);
+  border-radius:22px;box-shadow:var(--shadow);padding:20px}
+.panel.on{display:block}
+h2{margin:4px 0 8px;font-size:23px}
+h3{font-size:18px;margin:20px 0 8px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:.12em;color:#a06b28}
+.lead{font-size:16px;line-height:1.85;color:#544737;margin:0 0 6px}
+.hint{background:#eef5fb;border-radius:14px;padding:12px 15px;line-height:1.75;font-size:15px;margin:12px 0}
+.warn{background:#fff2e0;border-left:5px solid var(--accent);border-radius:0 14px 14px 0;padding:12px 15px;font-size:15px;line-height:1.75;margin:12px 0}
+
+label{display:block;font-weight:800;font-size:15px;color:#5b4e43;margin-top:14px}
+input[type=text],input[type=number],textarea,select{
+  width:100%;border:2px solid #e5dccd;background:#fff;border-radius:13px;
+  padding:13px;margin-top:6px;color:var(--ink);outline:none;min-height:52px
+}
+input:focus,textarea:focus,select:focus{border-color:#e9a447;box-shadow:0 0 0 3px rgba(239,156,50,.13)}
+textarea{min-height:86px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.btn{border:0;border-radius:14px;padding:13px 20px;font-weight:800;min-height:54px;margin:4px 6px 4px 0}
+.btn.p{background:linear-gradient(180deg,#f6ae49,#ee982b);color:#3a2916}
+.btn.s{background:#f1ece4;color:#4f4337}
+.btn.big{font-size:18px;padding:16px 26px;min-height:60px}
+.btn:disabled{opacity:.45}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.next{text-align:right;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+
+.cardlist{display:grid;gap:10px;margin-top:10px}
+.icard{border:2px solid var(--line);border-radius:16px;background:#fff;padding:12px 13px;position:relative}
+.icard .t{font-weight:800;line-height:1.55;padding-right:92px}
+.icard .tools{position:absolute;right:9px;top:9px;display:flex;gap:6px}
+.icard .tools button{border:0;border-radius:11px;padding:9px 11px;font-weight:800;font-size:14px;
+  background:#f1ece4;color:#5a4b3e;min-height:44px}
+.icard .tools .grab{background:#ffe5ae;touch-action:none}
+.icard.picked{border-color:var(--accent);background:#fff9ec;box-shadow:0 0 0 3px rgba(239,156,50,.15)}
+
+.pyramid{display:grid;gap:12px;margin:16px 0}
+.zone{border:2px dashed transparent;border-radius:20px;padding:14px;transition:.15s}
+.zone.top{background:var(--top);width:74%;margin:0 auto}
+.zone.mid{background:var(--mid);width:88%;margin:0 auto}
+.zone.bot{background:var(--bot);width:100%}
+.zone.over{border-color:#df8c25;box-shadow:0 0 0 4px rgba(239,156,50,.14)}
+.zh{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.zh .ic{font-size:23px}
+.zh strong{display:block}.zh small{display:block;color:var(--muted)}
+.empty{color:#8a8077;font-size:14px;padding:10px;text-align:center}
+.ghost{position:fixed;z-index:999;pointer-events:none;width:min(340px,68vw);opacity:.92;
+  transform:rotate(1.5deg);box-shadow:0 18px 40px rgba(60,45,30,.25)}
+.dragging{opacity:.25}
+
+.num{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;
+  background:#f8f4ec;border-radius:15px;padding:9px 12px;margin-top:9px}
+.num .lb{font-weight:800;font-size:16px}
+.num .v{min-width:52px;text-align:center;font-size:22px;font-weight:900}
+.num button{border:0;background:#fff;border:2px solid #e0d6c6;border-radius:12px;
+  width:52px;height:52px;font-size:23px;font-weight:900;color:#5a4b3e}
+.num button:active{background:#f3ece1}
+
+.qbox{background:#fff7dc;border-radius:18px;padding:16px;margin:12px 0}
+.qbox .lab{font-size:12px;font-weight:900;color:#a06b28;letter-spacing:.08em}
+.qbox .info{font-weight:800;font-size:17px;line-height:1.6;margin:6px 0 10px}
+.qbox .q{font-size:19px;font-weight:900;line-height:1.55}
+
+.bars{display:grid;gap:8px;margin-top:12px}
+.bar{display:grid;grid-template-columns:130px 1fr 46px;align-items:center;gap:9px;font-size:15px;font-weight:800}
+.bar .track{background:#ece5db;border-radius:9px;height:18px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent)}
+
+.choice2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.choice2 button{
+  border:3px solid #e5dccd;background:#fff;border-radius:18px;padding:18px 14px;
+  text-align:left;font-weight:800;font-size:16px;line-height:1.6;min-height:96px;color:var(--ink)
+}
+.choice2 button .em{font-size:26px;display:block;margin-bottom:4px}
+.choice2 button.on{border-color:var(--accent);background:#fff3d9}
+
+.compare{display:grid;grid-template-columns:1fr 96px 1fr;gap:10px;align-items:stretch;margin-top:14px}
+.side{border-radius:19px;padding:15px;min-height:150px}
+.side.a{background:#f1efec}
+.side.b{background:#fff0bd}
+.side .lab{font-size:12px;font-weight:900;color:#7a6b59}
+.side .info{font-weight:900;font-size:16px;line-height:1.55;margin:8px 0}
+.side .q{font-size:14px;line-height:1.55;color:#5f5346}
+.side .re{margin-top:10px;background:rgba(255,255,255,.72);border-radius:11px;padding:8px 10px;
+  font-size:13px;font-weight:800;line-height:1.7}
+.arrow{display:grid;place-items:center;gap:6px}
+.arrow .a1{font-size:30px;color:#d8912f;font-weight:900}
+.tag{border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900;text-align:center;line-height:1.4}
+.tag.chg{background:#ffe1a1}
+.tag.keep{background:#dfeeda}
+.sumcard{background:#edf6e7;border-radius:16px;padding:14px 16px;margin-top:14px;line-height:1.85;font-weight:700}
+.shot{background:#fff;border:3px solid var(--accent2);border-radius:20px;padding:18px;margin-top:16px}
+.shot .head{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:800}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#3e342a;color:#fff;
+  padding:13px 22px;border-radius:999px;font-weight:800;z-index:900;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:.95}
+
+@media(max-width:680px){
+  .row2{grid-template-columns:1fr}
+  .choice2{grid-template-columns:1fr}
+  .compare{grid-template-columns:1fr}
+  .arrow{padding:6px 0}
+  .arrow .a1{transform:rotate(90deg)}
+  .zone.top,.zone.mid{width:100%}
+  .bar{grid-template-columns:110px 1fr 40px}
+}
+@media print{
+  .app-header,.nav,.btnrow,.next,.toast,button{display:none!important}
+  .panel{display:none!important}
+  #p3{display:block!important;box-shadow:none;border:0}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <div class="eyebrow">2年 国語「あきが いっぱい」</div>
+    <h1>🍂 秋のひみつ研究所</h1>
+  </div>
+  <div class="badge">
+    <span class="who" id="who">—</span>
+    <button id="btnReset">さいしょから</button>
+  </div>
+</header>
+
+<main class="shell">
+  <nav class="nav">
+    <button id="t0" data-go="0"><span class="n">じゅんび</span>入力</button>
+    <button id="t1" data-go="1"><span class="n">① 本時</span>ふりかえる</button>
+    <button id="t2" data-go="2"><span class="n">② 本時</span>えらび直す</button>
+    <button id="t3" data-go="3"><span class="n">③ 本時</span>くらべる</button>
+  </nav>
+
+  <!-- ===== じゅんび ===== -->
+  <section id="p0" class="panel on">
+    <div class="kicker">じゅんび（前の時間に５分）</div>
+    <h2>ロイロの記録を うつそう</h2>
+    <p class="lead">本時までに、ここまで入れておきます。本時は「えらび直す」ことだけに集中できます。</p>
+
+    <div class="row2">
+      <label>出席番号
+        <input type="number" id="inNo" min="1" max="45" inputmode="numeric" placeholder="17">
+      </label>
+      <label>しらべた 秋のもの
+        <input type="text" id="inTopic" maxlength="30" placeholder="どんぐり">
+      </label>
+    </div>
+
+    <h3>１．集めた ひみつ（３〜５まい）</h3>
+    <p class="lead">ロイロのカードを見ながら、みじかくうつしてね。</p>
+    <div class="row2" style="grid-template-columns:1fr auto">
+      <input type="text" id="inInfo" maxlength="60" placeholder="れい：リスなどの動物が食べる">
+      <button class="btn p" id="btnAddInfo">＋ ふやす</button>
+    </div>
+    <div id="listInfo" class="cardlist"></div>
+
+    <h3>２．さいしょに つかった ひみつ</h3>
+    <select id="selFirst"></select>
+
+    <h3>３．さいしょの もんだい</h3>
+    <textarea id="inQ" maxlength="120" placeholder="れい：どんぐりを食べる動物はどれでしょう？"></textarea>
+
+    <h3>４．さいしょの はんのう</h3>
+    <p class="lead">ロイロの集計を見て、人数を入れてね。</p>
+    <div id="numsFirst"></div>
+
+    <div class="next">
+      <button class="btn p big" id="btnReady">じゅんび かんりょう →</button>
+    </div>
+  </section>
+
+  <!-- ===== ① ふりかえる ===== -->
+  <section id="p1" class="panel">
+    <div class="kicker">STEP 1</div>
+    <h2>🔎 ともだちの はんのうを 見よう</h2>
+    <div id="firstView"></div>
+    <div id="firstBars"></div>
+    <div id="firstMsg"></div>
+    <div class="next">
+      <button class="btn p big" data-go="2">つかう ひみつを 考える →</button>
+    </div>
+  </section>
+
+  <!-- ===== ② えらび直す ===== -->
+  <section id="p2" class="panel">
+    <div class="kicker">STEP 2</div>
+    <h2>💡 つかう ひみつを えらび直そう</h2>
+    <p class="lead">「☝️ つかむ」を おしたまま 指で うごかして、ならべかえよう。</p>
+
+    <div class="pyramid">
+      <section class="zone top" data-tier="top">
+        <div class="zh"><span class="ic">⭐</span><div><strong>ぜひ つかいたい</strong><small>ともだちに つたえたい ひみつ</small></div></div>
+        <div id="zTop" class="cardlist"></div>
+      </section>
+      <section class="zone mid" data-tier="middle">
+        <div class="zh"><span class="ic">🤔</span><div><strong>つかえるかも</strong><small>まだ 考えちゅう</small></div></div>
+        <div id="zMid" class="cardlist"></div>
+      </section>
+      <section class="zone bot" data-tier="bottom">
+        <div class="zh"><span class="ic">📦</span><div><strong>今回は つかわない</strong><small>大事だけど このクイズでは つかわない</small></div></div>
+        <div id="zBot" class="cardlist"></div>
+      </section>
+    </div>
+
+    <h3>どうする？</h3>
+    <div class="choice2">
+      <button id="btnChange" data-keep="0"><span class="em">🔄</span>ひみつを かえる<br><small style="font-weight:600">ちがう ひみつで つくり直す</small></button>
+      <button id="btnKeep" data-keep="1"><span class="em">✏️</span>ひみつは かえない<br><small style="font-weight:600">出し方だけ かえる</small></button>
+    </div>
+    <div class="hint">どちらでも いいよ。<b>かえない</b>ときも、わけが 言えたら すごい。</div>
+
+    <div id="afterChoice" hidden>
+      <h3>いま つかう ひみつ</h3>
+      <select id="selNow"></select>
+      <h3>あたらしい もんだい</h3>
+      <textarea id="inQ2" maxlength="120" placeholder="れい：どんぐりのぼうしを何というでしょう？"></textarea>
+      <div class="btnrow"><button class="btn p" id="btnSaveNow">これで きめた</button></div>
+    </div>
+
+    <div class="next">
+      <button class="btn p big" data-go="3">さいしょと くらべる →</button>
+    </div>
+  </section>
+
+  <!-- ===== ③ くらべる ===== -->
+  <section id="p3" class="panel">
+    <div class="kicker">STEP 3</div>
+    <h2>✨ さいしょと いま</h2>
+    <div id="shot"></div>
+
+    <label>どうして かえた（かえなかった）の？
+      <textarea id="inReason" maxlength="200" placeholder="れい：みんながすぐ分かったから、本ではじめて知ったひみつに かえました。"></textarea>
+    </label>
+    <div class="btnrow">
+      <button class="btn p" id="btnSaveReason">ふりかえりを ほぞん</button>
+      <button class="btn s" id="btnPrint">🖨 いんさつ／PDF</button>
+    </div>
+    <div id="doneMsg"></div>
+
+    <div class="warn">
+      できあがったら、この がめんを <b>スクリーンショット</b>して、ロイロの ていしゅつばこに 出そう。
+    </div>
+
+    <details style="margin-top:16px">
+      <summary style="font-weight:800;cursor:pointer;padding:10px 0">
+        あとで：あたらしいクイズの はんのうを 入れる（次の時間）
+      </summary>
+      <p class="lead">クイズ大会のあと、ロイロの集計を見て入れると、はんのうの変わり方が出ます。</p>
+      <div id="numsNow"></div>
+      <div class="btnrow"><button class="btn s" id="btnSaveNow2">ほぞん</button></div>
+    </details>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+var KEY = "akiHimitsuLabV3";
+var FB = [
+  { k: "total", em: "👥", label: "ためした人" },
+  { k: "correct", em: "✅", label: "せいかい" },
+  { k: "easy", em: "😴", label: "すぐ分かった" },
+  { k: "good", em: "🤔", label: "ちょうど迷った" },
+  { k: "hard", em: "😵", label: "むずかしかった" },
+  { k: "wow", em: "😲", label: "へえ！" }
+];
+
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c];
+  });
+}
+function zero() { return { total: 0, correct: 0, easy: 0, good: 0, hard: 0, wow: 0 }; }
+function emptyData() {
+  return {
+    no: "", topic: "", infos: [],
+    firstInfoId: "", firstQ: "", firstReact: zero(),
+    keep: null, nowInfoId: "", nowQ: "", nowReact: zero(),
+    reason: "", ready: false, updatedAt: Date.now()
+  };
+}
+var data = emptyData();
+var drag = null;
+var seq = 0;
+
+function save() {
+  data.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+}
+function load() {
+  var d = emptyData();
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var s = JSON.parse(raw); for (var k in s) d[k] = s[k]; }
+  } catch (e) {}
+  if (!Array.isArray(d.infos)) d.infos = [];
+  if (!d.firstReact) d.firstReact = zero();
+  if (!d.nowReact) d.nowReact = zero();
+  for (var i = 0; i < d.infos.length; i++) if (!d.infos[i].tier) d.infos[i].tier = "middle";
+  return d;
+}
+function uid() {
+  seq++;
+  return "i" + Date.now() + "_" + seq;
+}
+function toast(m) {
+  var t = $("toast");
+  t.textContent = m; t.classList.add("on");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function () { t.classList.remove("on"); }, 1800);
+}
+function findInfo(id) {
+  for (var i = 0; i < data.infos.length; i++) if (data.infos[i].id === id) return data.infos[i];
+  return null;
+}
+function infoText(id) {
+  var i = findInfo(id);
+  return i ? i.text : "（えらんでいません）";
+}
+
+/* ===== 画面きりかえ ===== */
+function go(n) {
+  for (var i = 0; i <= 3; i++) {
+    $("p" + i).classList.toggle("on", i === n);
+    $("t" + i).classList.toggle("on", i === n);
+  }
+  if (n === 1) renderFirst();
+  if (n === 2) { renderZones(); renderNowSelect(); renderChoice(); }
+  if (n === 3) renderCompare();
+  marks();
+  window.scrollTo(0, 0);
+}
+function marks() {
+  var d = [data.ready, data.ready, !!data.nowInfoId, !!data.reason];
+  for (var i = 0; i <= 3; i++) {
+    var b = $("t" + i);
+    b.classList.toggle("done", !!d[i] && !b.classList.contains("on"));
+  }
+  $("who").textContent = data.no ? data.no + "番" + (data.topic ? "・" + data.topic : "") : "—";
+}
+
+/* ===== 数を入れる部品 ===== */
+function numRows(container, obj, onChange) {
+  var box = $(container);
+  box.innerHTML = "";
+  FB.forEach(function (f) {
+    var row = document.createElement("div");
+    row.className = "num";
+    row.innerHTML = '<span class="lb">' + f.em + " " + f.label + "</span>" +
+      '<button type="button" data-d="-1">−</button>' +
+      '<span class="v">' + (obj[f.k] || 0) + "</span>" +
+      '<button type="button" data-d="1">＋</button>';
+    var v = row.querySelector(".v");
+    row.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var n = (obj[f.k] || 0) + Number(b.dataset.d);
+        if (n < 0) n = 0;
+        if (n > 45) n = 45;
+        obj[f.k] = n;
+        v.textContent = n;
+        save();
+        if (onChange) onChange();
+      });
+    });
+    box.appendChild(row);
+  });
+}
+
+/* ===== じゅんび ===== */
+function addInfo() {
+  var t = $("inInfo").value.trim();
+  if (!t) { toast("ひみつを 書いてね"); $("inInfo").focus(); return; }
+  if (data.infos.length >= 8) { toast("８まいまでにしよう"); return; }
+  data.infos.push({ id: uid(), text: t, tier: "middle" });
+  $("inInfo").value = "";
+  save(); renderInfoList(); renderFirstSelect(); renderNowSelect();
+  toast("ふえたよ");
+}
+function delInfo(id) {
+  data.infos = data.infos.filter(function (i) { return i.id !== id; });
+  save(); renderInfoList(); renderFirstSelect(); renderNowSelect(); renderZones();
+}
+function renderInfoList() {
+  var box = $("listInfo");
+  if (!data.infos.length) { box.innerHTML = '<div class="empty">まだ ありません</div>'; return; }
+  box.innerHTML = data.infos.map(function (i) {
+    return '<div class="icard"><div class="t">' + esc(i.text) + "</div>" +
+      '<div class="tools"><button type="button" data-del="' + esc(i.id) + '">けす</button></div></div>';
+  }).join("");
+}
+function fillSelect(sel, pool, current) {
+  sel.innerHTML = pool.length
+    ? pool.map(function (i) {
+        return '<option value="' + esc(i.id) + '">' + esc(i.text) + "</option>";
+      }).join("")
+    : '<option value="">先に ひみつを ふやしてね</option>';
+  if (current && findInfo(current)) sel.value = current;
+}
+function renderFirstSelect() { fillSelect($("selFirst"), data.infos, data.firstInfoId); }
+function renderNowSelect() {
+  var top = data.infos.filter(function (i) { return i.tier === "top"; });
+  var pool = top.length ? top : data.infos;
+  fillSelect($("selNow"), pool, data.nowInfoId || data.firstInfoId);
+}
+function readSetup() {
+  data.no = $("inNo").value.trim();
+  data.topic = $("inTopic").value.trim();
+  data.firstInfoId = $("selFirst").value;
+  data.firstQ = $("inQ").value.trim();
+  save();
+}
+function ready() {
+  readSetup();
+  if (!data.no) { toast("出席番号を 入れてね"); return; }
+  if (data.infos.length < 2) { toast("ひみつを ２まい いじょう 入れてね"); return; }
+  if (!data.firstInfoId) { toast("さいしょの ひみつを えらんでね"); return; }
+  if (!data.firstQ) { toast("さいしょの もんだいを 書いてね"); return; }
+  var f = findInfo(data.firstInfoId);
+  if (f) f.tier = "top";
+  data.ready = true;
+  if (!data.nowInfoId) data.nowInfoId = data.firstInfoId;
+  save(); go(1);
+  toast("じゅんび かんりょう！");
+}
+
+/* ===== ① ふりかえる ===== */
+function bars(react) {
+  var total = react.total || 0;
+  return '<div class="bars">' + FB.filter(function (f) { return f.k !== "total"; }).map(function (f) {
+    var n = react[f.k] || 0;
+    var w = total ? Math.round(n / total * 100) : 0;
+    return '<div class="bar"><span>' + f.em + " " + f.label + '</span>' +
+      '<span class="track"><span class="fill" style="width:' + w + '%"></span></span>' +
+      "<span>" + n + "人</span></div>";
+  }).join("") + "</div>";
+}
+function renderFirst() {
+  $("firstView").innerHTML = '<div class="qbox">' +
+    '<div class="lab">さいしょに つかった ひみつ</div>' +
+    '<div class="info">' + esc(infoText(data.firstInfoId)) + "</div>" +
+    '<div class="lab">さいしょの もんだい</div>' +
+    '<div class="q">' + esc(data.firstQ || "（まだ ありません）") + "</div></div>";
+  var r = data.firstReact;
+  $("firstBars").innerHTML = r.total
+    ? '<h3>ためしてくれた人：' + r.total + "人</h3>" + bars(r)
+    : '<div class="hint">はんのうが 入っていません。「じゅんび」で 入れてね。</div>';
+
+  var m = "ともだちの かおを 思い出そう。この ひみつで よかったかな？";
+  if (r.total >= 2 && r.easy / r.total >= 0.5) m = "「すぐ分かった」が おおいね。みんなが もう 知っていた ひみつ かも。";
+  else if (r.total >= 2 && r.hard / r.total >= 0.5) m = "「むずかしい」が おおいね。ひみつは そのままで、聞き方を かえられるかな？";
+  else if (r.total >= 1 && r.wow >= 1) m = "「へえ！」が 出ているね。どの ひみつが ともだちの はっけんに なったのかな？";
+  $("firstMsg").innerHTML = '<div class="hint">' + m + "</div>";
+}
+
+/* ===== ② えらび直す ===== */
+function cardHTML(i) {
+  return '<div class="icard' + (i.id === data.nowInfoId ? " picked" : "") + '" data-card="' + esc(i.id) + '">' +
+    '<div class="t">' + esc(i.text) + "</div>" +
+    '<div class="tools"><button type="button" class="grab" data-grab="' + esc(i.id) + '">☝️ つかむ</button></div></div>';
+}
+function renderZones() {
+  var map = { top: "zTop", middle: "zMid", bottom: "zBot" };
+  for (var k in map) {
+    var list = data.infos.filter(function (i) { return (i.tier || "middle") === k; });
+    $(map[k]).innerHTML = list.length
+      ? list.map(cardHTML).join("")
+      : '<div class="empty">ここに うごかせるよ</div>';
+  }
+}
+function moveInfo(id, tier) {
+  var i = findInfo(id);
+  if (!i || i.tier === tier) return;
+  i.tier = tier;
+  save(); renderZones(); renderNowSelect();
+}
+function renderChoice() {
+  $("btnChange").classList.toggle("on", data.keep === false);
+  $("btnKeep").classList.toggle("on", data.keep === true);
+  $("afterChoice").hidden = data.keep === null;
+  if (data.keep !== null) {
+    $("inQ2").value = data.nowQ || "";
+    $("selNow").disabled = data.keep === true;
+    if (data.keep === true) { data.nowInfoId = data.firstInfoId; renderNowSelect(); }
+  }
+}
+function setKeep(v) {
+  data.keep = v;
+  if (v === true) data.nowInfoId = data.firstInfoId;
+  save(); renderChoice(); renderZones();
+}
+function saveNow() {
+  data.nowInfoId = $("selNow").value || data.firstInfoId;
+  data.nowQ = $("inQ2").value.trim();
+  if (!data.nowQ) { toast("あたらしい もんだいを 書いてね"); return; }
+  save(); renderZones(); marks();
+  toast("きめたよ");
+}
+
+/* ===== ③ くらべる ===== */
+function reactLine(r) {
+  if (!r.total) return "";
+  return '<div class="re">👥' + r.total + "　✅" + r.correct +
+    "　😴" + r.easy + "　🤔" + r.good + "　😵" + r.hard + "　😲" + r.wow + "</div>";
+}
+function renderCompare() {
+  var changed = data.nowInfoId && data.firstInfoId && data.nowInfoId !== data.firstInfoId;
+  var html = '<div class="shot"><div class="head"><span>' +
+    esc(data.no ? data.no + "番" : "") + "</span><span>🍁 " + esc(data.topic || "秋のひみつ") + "</span></div>" +
+    '<div class="compare">' +
+      '<div class="side a"><div class="lab">🌱 さいしょ</div>' +
+        '<div class="info">' + esc(infoText(data.firstInfoId)) + "</div>" +
+        '<div class="q">' + esc(data.firstQ) + "</div>" + reactLine(data.firstReact) + "</div>" +
+      '<div class="arrow"><div class="a1">→</div>' +
+        '<div class="tag ' + (changed ? "chg" : "keep") + '">' +
+        (changed ? "ひみつを<br>えらび直した" : "同じひみつを<br>みがいた") + "</div></div>" +
+      '<div class="side b"><div class="lab">🌟 いま</div>' +
+        '<div class="info">' + esc(infoText(data.nowInfoId)) + "</div>" +
+        '<div class="q">' + esc(data.nowQ || "（まだ）") + "</div>" + reactLine(data.nowReact) + "</div>" +
+    "</div>";
+
+  if (data.reason) {
+    html += '<div class="sumcard"><b>わけ</b><br>' + esc(data.reason) + "</div>";
+  }
+  if (data.firstReact.total && data.nowReact.total) {
+    html += '<div class="sumcard"><b>はんのうの 変わり方</b><br>' +
+      "😴 すぐ分かった：" + data.firstReact.easy + "人 → " + data.nowReact.easy + "人<br>" +
+      "😲 へえ！：" + data.firstReact.wow + "人 → " + data.nowReact.wow + "人</div>";
+  }
+  html += "</div>";
+  $("shot").innerHTML = html;
+  $("inReason").value = data.reason || "";
+}
+function saveReason() {
+  var v = $("inReason").value.trim();
+  if (!v) { toast("わけを 書いてみよう"); return; }
+  data.reason = v;
+  save(); renderCompare(); marks();
+  $("doneMsg").innerHTML = '<div class="sumcard">🎉 ほぞん したよ。じぶんの 考えの かわり方が のこったね。</div>';
+}
+
+/* ===== ドラッグ（Pointer Events） ===== */
+function beginDrag(handle, ev) {
+  if (ev.button !== undefined && ev.button !== 0) return;
+  var id = handle.dataset.grab;
+  var src = null, all = document.querySelectorAll("[data-card]");
+  for (var i = 0; i < all.length; i++) if (all[i].dataset.card === id) src = all[i];
+  if (!src) return;
+  ev.preventDefault();
+  if (handle.setPointerCapture) { try { handle.setPointerCapture(ev.pointerId); } catch (e) {} }
+  var g = src.cloneNode(true);
+  g.className = "icard ghost";
+  var tools = g.querySelector(".tools");
+  if (tools) tools.remove();
+  document.body.appendChild(g);
+  src.classList.add("dragging");
+  drag = { id: id, src: src, ghost: g, pid: ev.pointerId, zone: null };
+  moveGhost(ev.clientX, ev.clientY);
+}
+function moveGhost(x, y) {
+  if (!drag) return;
+  drag.ghost.style.left = Math.min(window.innerWidth - 20, x + 14) + "px";
+  drag.ghost.style.top = Math.max(8, y - 28) + "px";
+}
+function onMove(ev) {
+  if (!drag || ev.pointerId !== drag.pid) return;
+  ev.preventDefault();
+  moveGhost(ev.clientX, ev.clientY);
+  var zs = document.querySelectorAll(".zone");
+  for (var i = 0; i < zs.length; i++) zs[i].classList.remove("over");
+  var el = document.elementFromPoint(ev.clientX, ev.clientY);
+  var z = el && el.closest ? el.closest(".zone") : null;
+  drag.zone = z;
+  if (z) z.classList.add("over");
+}
+function onUp(ev) {
+  if (!drag || ev.pointerId !== drag.pid) return;
+  var zs = document.querySelectorAll(".zone");
+  for (var i = 0; i < zs.length; i++) zs[i].classList.remove("over");
+  var d = drag;
+  d.src.classList.remove("dragging");
+  d.ghost.remove();
+  drag = null;
+  if (d.zone) moveInfo(d.id, d.zone.dataset.tier);
+}
+
+/* ===== リセット ===== */
+function resetAll() {
+  if (!confirm("この iPad の きろくを ぜんぶ けしますか？")) return;
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  data = emptyData();
+  $("inNo").value = ""; $("inTopic").value = ""; $("inQ").value = "";
+  $("inQ2").value = ""; $("inReason").value = ""; $("doneMsg").innerHTML = "";
+  boot(true);
+  go(0);
+}
+
+/* ===== 起動 ===== */
+function bind() {
+  document.addEventListener("click", function (e) {
+    var g = e.target.closest("[data-go]"); if (g) return go(Number(g.dataset.go));
+    var d = e.target.closest("[data-del]"); if (d) return delInfo(d.dataset.del);
+    var k = e.target.closest("[data-keep]"); if (k) return setKeep(k.dataset.keep === "1");
+  });
+  document.addEventListener("pointerdown", function (e) {
+    var h = e.target.closest("[data-grab]");
+    if (h) beginDrag(h, e);
+  });
+  window.addEventListener("pointermove", onMove, { passive: false });
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
+
+  $("btnAddInfo").addEventListener("click", addInfo);
+  $("inInfo").addEventListener("keydown", function (e) { if (e.key === "Enter") addInfo(); });
+  $("btnReady").addEventListener("click", ready);
+  $("btnSaveNow").addEventListener("click", saveNow);
+  $("btnSaveReason").addEventListener("click", saveReason);
+  $("btnSaveNow2").addEventListener("click", function () {
+    save(); renderCompare(); toast("ほぞん したよ");
+  });
+  $("btnPrint").addEventListener("click", function () { window.print(); });
+  $("btnReset").addEventListener("click", resetAll);
+  ["inNo", "inTopic", "inQ"].forEach(function (id) {
+    $(id).addEventListener("change", readSetup);
+  });
+  $("selFirst").addEventListener("change", function () {
+    data.firstInfoId = $("selFirst").value; save();
+  });
+}
+function boot(skipLoad) {
+  if (!skipLoad) data = load();
+  $("inNo").value = data.no || "";
+  $("inTopic").value = data.topic || "";
+  $("inQ").value = data.firstQ || "";
+  $("inQ2").value = data.nowQ || "";
+  $("inReason").value = data.reason || "";
+  renderInfoList();
+  renderFirstSelect();
+  renderNowSelect();
+  numRows("numsFirst", data.firstReact);
+  numRows("numsNow", data.nowReact, function () { renderCompare(); });
+  marks();
+  if (data.ready) go(1); else go(0);
+}
+bind();
+boot();
+</script>
+</body>
+</html>
