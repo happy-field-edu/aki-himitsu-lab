@@ -70,12 +70,27 @@ textarea{min-height:86px;resize:vertical}
 
 .cardlist{display:grid;gap:10px;margin-top:10px}
 .icard{border:2px solid var(--line);border-radius:16px;background:#fff;padding:12px 13px;position:relative}
-.icard .t{font-weight:800;line-height:1.55;padding-right:92px}
+.icard .body{display:flex;gap:11px;align-items:flex-start}
+.icard .t{font-weight:800;line-height:1.55;flex:1}
+.zone .icard .t{padding-right:92px}
+.icard .thumb{width:76px;height:76px;object-fit:cover;border-radius:12px;border:2px solid var(--line);
+  flex:none;background:#f3ede4;cursor:zoom-in}
+.zone .icard .thumb{width:66px;height:66px}
 .icard .tools{position:absolute;right:9px;top:9px;display:flex;gap:6px}
 .icard .tools button{border:0;border-radius:11px;padding:9px 11px;font-weight:800;font-size:14px;
   background:#f1ece4;color:#5a4b3e;min-height:44px}
 .icard .tools .grab{background:#ffe5ae;touch-action:none}
 .icard.picked{border-color:var(--accent);background:#fff9ec;box-shadow:0 0 0 3px rgba(239,156,50,.15)}
+.picbtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.picbtns button{border:2px solid #e0d6c6;background:#fff;border-radius:12px;padding:9px 13px;
+  font-weight:800;font-size:14px;color:#5a4b3e;min-height:46px}
+.picbtns button.cam{background:#eaf3fb;border-color:#b8d5ec;color:#25588a}
+.picbtns button:active{background:#f6f0e7}
+.viewer{position:fixed;inset:0;background:rgba(42,33,24,.93);z-index:950;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px}
+.viewer[hidden]{display:none}
+.viewer img{max-width:100%;max-height:76vh;border-radius:14px;background:#fff}
+.viewer .cap{color:#fff6e6;font-weight:800;font-size:15px;text-align:center;line-height:1.6}
 
 .pyramid{display:grid;gap:12px;margin:16px 0}
 .zone{border:2px dashed transparent;border-radius:20px;padding:14px;transition:.15s}
@@ -201,7 +216,8 @@ textarea{min-height:86px;resize:vertical}
     </div>
 
     <h3>１．集めた ひみつ（３〜５まい）</h3>
-    <p class="lead">ロイロのカードを見ながら、みじかくうつしてね。</p>
+    <p class="lead">ロイロのカードを見ながら、みじかくうつしてね。<br>
+      「いいな」と おもった <b>本の ページの しゃしん</b>も つけられるよ。</p>
     <div class="row2" style="grid-template-columns:1fr auto">
       <input type="text" id="inInfo" maxlength="60" placeholder="れい：リスなどの動物が食べる">
       <button class="btn p" id="btnAddInfo">＋ ふやす</button>
@@ -306,6 +322,14 @@ textarea{min-height:86px;resize:vertical}
   </section>
 </main>
 
+<input type="file" id="photoInput" accept="image/*" hidden>
+
+<div class="viewer" id="viewer" hidden>
+  <img id="viewerImg" alt="本の ページ">
+  <div class="cap" id="viewerCap"></div>
+  <button class="btn p big" id="viewerClose">とじる</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -341,7 +365,12 @@ var seq = 0;
 
 function save() {
   data.updatedAt = Date.now();
-  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 function load() {
   var d = emptyData();
@@ -436,12 +465,107 @@ function delInfo(id) {
   data.infos = data.infos.filter(function (i) { return i.id !== id; });
   save(); renderInfoList(); renderFirstSelect(); renderNowSelect(); renderZones();
 }
+
+/* ===== 本の ページの しゃしん ===== */
+var pendingPhotoId = "";
+
+function safePhoto(p) {
+  return (typeof p === "string" &&
+    /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(p)) ? p : "";
+}
+
+/* iPadの写真は そのままだと 大きすぎるので 小さくしてから しまう */
+function shrinkPhoto(file, done) {
+  var reader = new FileReader();
+  reader.onerror = function () { done(null); };
+  reader.onload = function (e) {
+    var img = new Image();
+    img.onerror = function () { done(null); };
+    img.onload = function () {
+      try {
+        var max = 900;
+        var s = Math.min(1, max / Math.max(img.width, img.height));
+        var cw = Math.max(1, Math.round(img.width * s));
+        var ch = Math.max(1, Math.round(img.height * s));
+        var c = document.createElement("canvas");
+        c.width = cw; c.height = ch;
+        c.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        done(c.toDataURL("image/jpeg", 0.65));
+      } catch (err) { done(null); }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyPhoto(id, dataUrl) {
+  var info = findInfo(id);
+  if (!info) return false;
+  var ok = safePhoto(dataUrl);
+  if (!ok) { toast("この しゃしんは つかえません"); return false; }
+  var before = info.photo || "";
+  info.photo = ok;
+  if (!save()) {
+    info.photo = before;
+    save();
+    toast("しゃしんが おおいみたい。いらない しゃしんを けしてね");
+    return false;
+  }
+  renderInfoList(); renderZones();
+  toast("しゃしんを つけたよ");
+  return true;
+}
+
+function removePhoto(id) {
+  var info = findInfo(id);
+  if (!info) return;
+  info.photo = "";
+  save(); renderInfoList(); renderZones();
+}
+
+function askPhoto(id) {
+  pendingPhotoId = id;
+  $("photoInput").value = "";
+  $("photoInput").click();
+}
+
+function onPhotoPicked(e) {
+  var f = e.target.files && e.target.files[0];
+  var id = pendingPhotoId;
+  pendingPhotoId = "";
+  if (!f || !id) return;
+  toast("しゃしんを よみこみちゅう…");
+  shrinkPhoto(f, function (url) {
+    if (!url) { toast("しゃしんを よみこめませんでした"); return; }
+    applyPhoto(id, url);
+  });
+}
+
+function openViewer(id) {
+  var info = findInfo(id);
+  if (!info || !safePhoto(info.photo)) return;
+  $("viewerImg").src = info.photo;
+  $("viewerCap").textContent = info.text;
+  $("viewer").hidden = false;
+}
+function closeViewer() {
+  $("viewer").hidden = true;
+  $("viewerImg").src = "";
+}
 function renderInfoList() {
   var box = $("listInfo");
   if (!data.infos.length) { box.innerHTML = '<div class="empty">まだ ありません</div>'; return; }
   box.innerHTML = data.infos.map(function (i) {
-    return '<div class="icard"><div class="t">' + esc(i.text) + "</div>" +
-      '<div class="tools"><button type="button" data-del="' + esc(i.id) + '">けす</button></div></div>';
+    var ph = safePhoto(i.photo);
+    return '<div class="icard"><div class="body">' +
+      (ph ? '<img class="thumb" src="' + ph + '" alt="本の ページ" data-photo="' + esc(i.id) + '">' : "") +
+      '<div class="t">' + esc(i.text) + "</div></div>" +
+      '<div class="picbtns">' +
+        '<button type="button" class="cam" data-pic="' + esc(i.id) + '">📷 ' +
+          (ph ? "しゃしんを かえる" : "本の ページの しゃしん") + "</button>" +
+        (ph ? '<button type="button" data-picdel="' + esc(i.id) + '">しゃしんを けす</button>' : "") +
+        '<button type="button" data-del="' + esc(i.id) + '">カードを けす</button>' +
+      "</div></div>";
   }).join("");
 }
 function fillSelect(sel, pool, current) {
@@ -530,8 +654,12 @@ function renderFirst() {
 
 /* ===== ② えらび直す ===== */
 function cardHTML(i) {
+  var ph = safePhoto(i.photo);
   return '<div class="icard' + (i.id === data.nowInfoId ? " picked" : "") + '" data-card="' + esc(i.id) + '">' +
-    '<div class="t">' + esc(i.text) + "</div>" +
+    '<div class="body">' +
+      (ph ? '<img class="thumb" src="' + ph + '" alt="本の ページ" data-photo="' + esc(i.id) + '">' : "") +
+      '<div class="t">' + esc(i.text) + "</div>" +
+    "</div>" +
     '<div class="tools"><button type="button" class="grab" data-grab="' + esc(i.id) + '">☝️ つかむ</button></div></div>';
 }
 function renderZones() {
@@ -686,9 +814,17 @@ function resetAll() {
 /* ===== 起動 ===== */
 function bind() {
   document.addEventListener("click", function (e) {
+    var v = e.target.closest("[data-photo]"); if (v) return openViewer(v.dataset.photo);
+    var pic = e.target.closest("[data-pic]"); if (pic) return askPhoto(pic.dataset.pic);
+    var pd = e.target.closest("[data-picdel]"); if (pd) return removePhoto(pd.dataset.picdel);
     var g = e.target.closest("[data-go]"); if (g) return go(Number(g.dataset.go));
     var d = e.target.closest("[data-del]"); if (d) return delInfo(d.dataset.del);
     var k = e.target.closest("[data-keep]"); if (k) return setKeep(k.dataset.keep === "1");
+  });
+  $("photoInput").addEventListener("change", onPhotoPicked);
+  $("viewerClose").addEventListener("click", closeViewer);
+  $("viewer").addEventListener("click", function (e) {
+    if (e.target === $("viewer")) closeViewer();
   });
   document.addEventListener("pointerdown", function (e) {
     var h = e.target.closest("[data-grab]");
