@@ -10,7 +10,7 @@
 html{-webkit-text-size-adjust:100%}
 :root{
   --ink:#3e342a;--muted:#74695f;--line:#eadfca;--accent:#ef9c32;--accent2:#ffd883;
-  --top:#fff0be;--mid:#e8f2db;--bot:#eeeef1;--shadow:0 8px 24px rgba(84,62,34,.08)
+  --shadow:0 8px 24px rgba(84,62,34,.08)
 }
 body{
   margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
@@ -72,15 +72,11 @@ textarea{min-height:86px;resize:vertical}
 .icard{border:2px solid var(--line);border-radius:16px;background:#fff;padding:12px 13px;position:relative}
 .icard .body{display:flex;gap:11px;align-items:flex-start}
 .icard .t{font-weight:800;line-height:1.55;flex:1}
-.zone .icard .t{padding-right:92px}
 .icard .thumb{width:76px;height:76px;object-fit:cover;border-radius:12px;border:2px solid var(--line);
   flex:none;background:#f3ede4;cursor:zoom-in}
-.zone .icard .thumb{width:66px;height:66px}
 .icard .tools{position:absolute;right:9px;top:9px;display:flex;gap:6px}
 .icard .tools button{border:0;border-radius:11px;padding:9px 11px;font-weight:800;font-size:14px;
   background:#f1ece4;color:#5a4b3e;min-height:44px}
-.icard .tools .grab{background:#ffe5ae;touch-action:none}
-.icard.picked{border-color:var(--accent);background:#fff9ec;box-shadow:0 0 0 3px rgba(239,156,50,.15)}
 .picbtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
 .picbtns button{border:2px solid #e0d6c6;background:#fff;border-radius:12px;padding:9px 13px;
   font-weight:800;font-size:14px;color:#5a4b3e;min-height:46px}
@@ -92,19 +88,15 @@ textarea{min-height:86px;resize:vertical}
 .viewer img{max-width:100%;max-height:76vh;border-radius:14px;background:#fff}
 .viewer .cap{color:#fff6e6;font-weight:800;font-size:15px;text-align:center;line-height:1.6}
 
-.pyramid{display:grid;gap:12px;margin:16px 0}
-.zone{border:2px dashed transparent;border-radius:20px;padding:14px;transition:.15s}
-.zone.top{background:var(--top);width:74%;margin:0 auto}
-.zone.mid{background:var(--mid);width:88%;margin:0 auto}
-.zone.bot{background:var(--bot);width:100%}
-.zone.over{border-color:#df8c25;box-shadow:0 0 0 4px rgba(239,156,50,.14)}
-.zh{display:flex;align-items:center;gap:9px;margin-bottom:8px}
-.zh .ic{font-size:23px}
-.zh strong{display:block}.zh small{display:block;color:var(--muted)}
 .empty{color:#8a8077;font-size:14px;padding:10px;text-align:center}
-.ghost{position:fixed;z-index:999;pointer-events:none;width:min(340px,68vw);opacity:.92;
-  transform:rotate(1.5deg);box-shadow:0 18px 40px rgba(60,45,30,.25)}
-.dragging{opacity:.25}
+.pick{cursor:pointer;padding-right:56px}
+.pick .mark{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:26px;opacity:.2}
+.pick.on{border-color:var(--accent);background:#fff7e4;box-shadow:0 0 0 3px rgba(239,156,50,.18)}
+.pick.on .mark{opacity:1}
+.pick .thumb{width:66px;height:66px}
+.deskcue{background:#eef5fb;border-left:5px solid #7fb0d8;border-radius:0 14px 14px 0;
+  padding:13px 16px;line-height:1.75;margin:12px 0;font-weight:700}
 
 .num{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;
   background:#f8f4ec;border-radius:15px;padding:9px 12px;margin-top:9px}
@@ -114,9 +106,6 @@ textarea{min-height:86px;resize:vertical}
   width:52px;height:52px;font-size:23px;font-weight:900;color:#5a4b3e}
 .num button:active{background:#f3ece1}
 
-.picked{background:#fff7dc;border:2px solid #f0d79a;border-radius:14px;padding:14px;
-  font-weight:800;line-height:1.6;margin-top:6px}
-.pickednote{font-size:13px;font-weight:700;color:var(--muted);margin-top:5px}
 .qbox{background:#fff7dc;border-radius:18px;padding:16px;margin:12px 0}
 .qbox .lab{font-size:12px;font-weight:900;color:#a06b28;letter-spacing:.08em}
 .qbox .info{font-weight:800;font-size:17px;line-height:1.6;margin:6px 0 10px}
@@ -255,21 +244,9 @@ textarea{min-height:86px;resize:vertical}
   <section id="p2" class="panel">
     <div class="kicker">②</div>
     <h2>💡 つかう ひみつを えらび直そう</h2>
-    <p class="lead">「☝️ つかむ」を おしたまま 指で うごかして、ならべかえよう。</p>
-
-    <div class="pyramid">
-      <section class="zone top" data-tier="top">
-        <div class="zh"><span class="ic">⭐</span><div><strong>ぜひ つかいたい</strong><small>ともだちに つたえたい ひみつ</small></div></div>
-        <div id="zTop" class="cardlist"></div>
-      </section>
-      <section class="zone mid" data-tier="middle">
-        <div class="zh"><span class="ic">🤔</span><div><strong>つかえるかも</strong><small>まだ 考えちゅう</small></div></div>
-        <div id="zMid" class="cardlist"></div>
-      </section>
-      <section class="zone bot" data-tier="bottom">
-        <div class="zh"><span class="ic">📦</span><div><strong>今回は つかわない</strong><small>大事だけど このクイズでは つかわない</small></div></div>
-        <div id="zBot" class="cardlist"></div>
-      </section>
+    <div class="deskcue">
+      まず つくえの上の <b>カード</b>を うごかして、じぶんで きめよう。<br>
+      きまったら、ここに タップで のこします。
     </div>
 
     <h3>どうする？</h3>
@@ -280,12 +257,9 @@ textarea{min-height:86px;resize:vertical}
     <div class="hint">どちらでも いいよ。<b>かえない</b>ときも、わけが 言えたら すごい。</div>
 
     <div id="afterChoice" hidden>
-      <h3>いま つかう ひみつ</h3>
-      <select id="selNow"></select>
-      <div id="keepBox" hidden></div>
-      <h3>あたらしい もんだい</h3>
-      <textarea id="inQ2" maxlength="120" placeholder="れい：どんぐりのぼうしを何というでしょう？"></textarea>
-      <div class="btnrow"><button class="btn p" id="btnSaveNow">これで きめた</button></div>
+      <h3 id="pickTitle">いま つかう ひみつ</h3>
+      <p class="lead" id="pickNote"></p>
+      <div id="pickList" class="cardlist"></div>
     </div>
 
     <div class="next">
@@ -355,12 +329,11 @@ function emptyData() {
   return {
     no: "", topic: "", infos: [],
     firstInfoId: "", firstQ: "", firstReact: zero(),
-    keep: null, nowInfoId: "", nowQ: "", nowReact: zero(),
+    keep: null, nowInfoId: "", nowReact: zero(),
     reason: "", ready: false, updatedAt: Date.now()
   };
 }
 var data = emptyData();
-var drag = null;
 var seq = 0;
 
 function save() {
@@ -381,7 +354,6 @@ function load() {
   if (!Array.isArray(d.infos)) d.infos = [];
   if (!d.firstReact) d.firstReact = zero();
   if (!d.nowReact) d.nowReact = zero();
-  for (var i = 0; i < d.infos.length; i++) if (!d.infos[i].tier) d.infos[i].tier = "middle";
   return d;
 }
 function uid() {
@@ -410,7 +382,7 @@ function go(n) {
     $("t" + i).classList.toggle("on", i === n);
   }
   if (n === 1) renderFirst();
-  if (n === 2) { renderZones(); renderNowSelect(); renderChoice(); }
+  if (n === 2) renderChoice();
   if (n === 3) renderCompare();
   marks();
   window.scrollTo(0, 0);
@@ -456,14 +428,14 @@ function addInfo() {
   var t = $("inInfo").value.trim();
   if (!t) { toast("ひみつを 書いてね"); $("inInfo").focus(); return; }
   if (data.infos.length >= 8) { toast("８まいまでにしよう"); return; }
-  data.infos.push({ id: uid(), text: t, tier: "middle" });
+  data.infos.push({ id: uid(), text: t, photo: "" });
   $("inInfo").value = "";
-  save(); renderInfoList(); renderFirstSelect(); renderNowSelect();
+  save(); renderInfoList(); renderFirstSelect(); renderPickList();
   toast("ふえたよ");
 }
 function delInfo(id) {
   data.infos = data.infos.filter(function (i) { return i.id !== id; });
-  save(); renderInfoList(); renderFirstSelect(); renderNowSelect(); renderZones();
+  save(); renderInfoList(); renderFirstSelect(); renderPickList();
 }
 
 /* ===== 本の ページの しゃしん ===== */
@@ -511,7 +483,7 @@ function applyPhoto(id, dataUrl) {
     toast("しゃしんが おおいみたい。いらない しゃしんを けしてね");
     return false;
   }
-  renderInfoList(); renderZones();
+  renderInfoList(); renderPickList();
   toast("しゃしんを つけたよ");
   return true;
 }
@@ -520,7 +492,7 @@ function removePhoto(id) {
   var info = findInfo(id);
   if (!info) return;
   info.photo = "";
-  save(); renderInfoList(); renderZones();
+  save(); renderInfoList(); renderPickList();
 }
 
 function askPhoto(id) {
@@ -577,11 +549,6 @@ function fillSelect(sel, pool, current) {
   if (current && findInfo(current)) sel.value = current;
 }
 function renderFirstSelect() { fillSelect($("selFirst"), data.infos, data.firstInfoId); }
-function renderNowSelect() {
-  var top = data.infos.filter(function (i) { return i.tier === "top"; });
-  var pool = top.length ? top : data.infos;
-  fillSelect($("selNow"), pool, data.nowInfoId || data.firstInfoId);
-}
 function readSetup() {
   data.no = $("inNo").value.trim();
   data.topic = $("inTopic").value.trim();
@@ -595,8 +562,6 @@ function ready() {
   if (data.infos.length < 2) { toast("ひみつを ２まい いじょう 入れてね"); return; }
   if (!data.firstInfoId) { toast("さいしょの ひみつを えらんでね"); return; }
   if (!data.firstQ) { toast("さいしょの もんだいを 書いてね"); return; }
-  var f = findInfo(data.firstInfoId);
-  if (f) f.tier = "top";
   data.ready = true;
   if (!data.nowInfoId) data.nowInfoId = data.firstInfoId;
   save(); go(1);
@@ -653,64 +618,55 @@ function renderFirst() {
 }
 
 /* ===== ② えらび直す ===== */
-function cardHTML(i) {
+/* ② で タップして えらぶ カード */
+function pickCardHTML(i, selectable) {
   var ph = safePhoto(i.photo);
-  return '<div class="icard' + (i.id === data.nowInfoId ? " picked" : "") + '" data-card="' + esc(i.id) + '">' +
+  var on = i.id === data.nowInfoId;
+  return '<div class="icard pick' + (on ? " on" : "") + '"' +
+    (selectable ? ' data-pick="' + esc(i.id) + '"' : "") + '>' +
     '<div class="body">' +
       (ph ? '<img class="thumb" src="' + ph + '" alt="本の ページ" data-photo="' + esc(i.id) + '">' : "") +
       '<div class="t">' + esc(i.text) + "</div>" +
     "</div>" +
-    '<div class="tools"><button type="button" class="grab" data-grab="' + esc(i.id) + '">☝️ つかむ</button></div></div>';
+    '<span class="mark">' + (on ? "✅" : "◯") + "</span></div>";
 }
-function renderZones() {
-  var map = { top: "zTop", middle: "zMid", bottom: "zBot" };
-  for (var k in map) {
-    var list = data.infos.filter(function (i) { return (i.tier || "middle") === k; });
-    $(map[k]).innerHTML = list.length
-      ? list.map(cardHTML).join("")
-      : '<div class="empty">ここに うごかせるよ</div>';
+
+function renderPickList() {
+  var box = $("pickList");
+  if (!box) return;
+  if (data.keep === true) {
+    var f = findInfo(data.firstInfoId);
+    $("pickTitle").textContent = "いま つかう ひみつ";
+    $("pickNote").textContent = "この ひみつは かえません。";
+    box.innerHTML = f ? pickCardHTML(f, false) : '<div class="empty">ひみつが ありません</div>';
+    return;
   }
+  $("pickTitle").textContent = "いま つかう ひみつを 1つ えらぼう";
+  $("pickNote").textContent = "しゃしんを タップすると、本の ページが 大きく 見られるよ。";
+  box.innerHTML = data.infos.length
+    ? data.infos.map(function (i) { return pickCardHTML(i, true); }).join("")
+    : '<div class="empty">ひみつが ありません</div>';
 }
-function moveInfo(id, tier) {
-  var i = findInfo(id);
-  if (!i || i.tier === tier) return;
-  i.tier = tier;
-  save(); renderZones(); renderNowSelect();
+
+function pickInfo(id) {
+  if (data.keep === true) return;
+  if (!findInfo(id)) return;
+  data.nowInfoId = id;
+  save(); renderPickList(); marks();
+  toast("これに きめたよ");
 }
 function renderChoice() {
   $("btnChange").classList.toggle("on", data.keep === false);
   $("btnKeep").classList.toggle("on", data.keep === true);
   $("afterChoice").hidden = data.keep === null;
   if (data.keep === null) return;
-
-  $("inQ2").value = data.nowQ || "";
-
-  if (data.keep === true) {
-    // ひみつは かえない → さいしょの ひみつを そのまま見せる
-    data.nowInfoId = data.firstInfoId;
-    $("selNow").hidden = true;
-    $("keepBox").hidden = false;
-    $("keepBox").innerHTML = '<div class="picked">' + esc(infoText(data.firstInfoId)) +
-      '<div class="pickednote">この ひみつは かえません</div></div>';
-  } else {
-    $("selNow").hidden = false;
-    $("keepBox").hidden = true;
-    renderNowSelect();
-  }
+  if (data.keep === true) data.nowInfoId = data.firstInfoId;
+  renderPickList();
 }
 function setKeep(v) {
   data.keep = v;
   if (v === true) data.nowInfoId = data.firstInfoId;
-  save(); renderChoice(); renderZones();
-}
-function saveNow() {
-  data.nowInfoId = data.keep === true
-    ? data.firstInfoId
-    : ($("selNow").value || data.firstInfoId);
-  data.nowQ = $("inQ2").value.trim();
-  if (!data.nowQ) { toast("あたらしい もんだいを 書いてね"); return; }
-  save(); renderZones(); marks();
-  toast("きめたよ");
+  save(); renderChoice(); marks();
 }
 
 /* ===== ③ くらべる ===== */
@@ -732,7 +688,7 @@ function renderCompare() {
         (changed ? "ひみつを<br>えらび直した" : "同じひみつを<br>みがいた") + "</div></div>" +
       '<div class="side b"><div class="lab">🌟 いま</div>' +
         '<div class="info">' + esc(infoText(data.nowInfoId)) + "</div>" +
-        '<div class="q">' + esc(data.nowQ || "（まだ）") + "</div>" + reactLine(data.nowReact) + "</div>" +
+        '<div class="q">もんだいは つぎの じかんに つくるよ</div>' + reactLine(data.nowReact) + "</div>" +
     "</div>";
 
   if (data.reason) {
@@ -755,58 +711,13 @@ function saveReason() {
   $("doneMsg").innerHTML = '<div class="sumcard">🎉 ほぞん したよ。じぶんの 考えの かわり方が のこったね。</div>';
 }
 
-/* ===== ドラッグ（Pointer Events） ===== */
-function beginDrag(handle, ev) {
-  if (ev.button !== undefined && ev.button !== 0) return;
-  var id = handle.dataset.grab;
-  var src = null, all = document.querySelectorAll("[data-card]");
-  for (var i = 0; i < all.length; i++) if (all[i].dataset.card === id) src = all[i];
-  if (!src) return;
-  ev.preventDefault();
-  if (handle.setPointerCapture) { try { handle.setPointerCapture(ev.pointerId); } catch (e) {} }
-  var g = src.cloneNode(true);
-  g.className = "icard ghost";
-  var tools = g.querySelector(".tools");
-  if (tools) tools.remove();
-  document.body.appendChild(g);
-  src.classList.add("dragging");
-  drag = { id: id, src: src, ghost: g, pid: ev.pointerId, zone: null };
-  moveGhost(ev.clientX, ev.clientY);
-}
-function moveGhost(x, y) {
-  if (!drag) return;
-  drag.ghost.style.left = Math.min(window.innerWidth - 20, x + 14) + "px";
-  drag.ghost.style.top = Math.max(8, y - 28) + "px";
-}
-function onMove(ev) {
-  if (!drag || ev.pointerId !== drag.pid) return;
-  ev.preventDefault();
-  moveGhost(ev.clientX, ev.clientY);
-  var zs = document.querySelectorAll(".zone");
-  for (var i = 0; i < zs.length; i++) zs[i].classList.remove("over");
-  var el = document.elementFromPoint(ev.clientX, ev.clientY);
-  var z = el && el.closest ? el.closest(".zone") : null;
-  drag.zone = z;
-  if (z) z.classList.add("over");
-}
-function onUp(ev) {
-  if (!drag || ev.pointerId !== drag.pid) return;
-  var zs = document.querySelectorAll(".zone");
-  for (var i = 0; i < zs.length; i++) zs[i].classList.remove("over");
-  var d = drag;
-  d.src.classList.remove("dragging");
-  d.ghost.remove();
-  drag = null;
-  if (d.zone) moveInfo(d.id, d.zone.dataset.tier);
-}
-
 /* ===== リセット ===== */
 function resetAll() {
   if (!confirm("この iPad の きろくを ぜんぶ けしますか？")) return;
   try { localStorage.removeItem(KEY); } catch (e) {}
   data = emptyData();
   $("inNo").value = ""; $("inTopic").value = ""; $("inQ").value = "";
-  $("inQ2").value = ""; $("inReason").value = ""; $("doneMsg").innerHTML = "";
+  $("inReason").value = ""; $("doneMsg").innerHTML = "";
   boot(true);
   go(0);
 }
@@ -817,6 +728,7 @@ function bind() {
     var v = e.target.closest("[data-photo]"); if (v) return openViewer(v.dataset.photo);
     var pic = e.target.closest("[data-pic]"); if (pic) return askPhoto(pic.dataset.pic);
     var pd = e.target.closest("[data-picdel]"); if (pd) return removePhoto(pd.dataset.picdel);
+    var pk = e.target.closest("[data-pick]"); if (pk) return pickInfo(pk.dataset.pick);
     var g = e.target.closest("[data-go]"); if (g) return go(Number(g.dataset.go));
     var d = e.target.closest("[data-del]"); if (d) return delInfo(d.dataset.del);
     var k = e.target.closest("[data-keep]"); if (k) return setKeep(k.dataset.keep === "1");
@@ -826,33 +738,15 @@ function bind() {
   $("viewer").addEventListener("click", function (e) {
     if (e.target === $("viewer")) closeViewer();
   });
-  document.addEventListener("pointerdown", function (e) {
-    var h = e.target.closest("[data-grab]");
-    if (h) beginDrag(h, e);
-  });
-  window.addEventListener("pointermove", onMove, { passive: false });
-  window.addEventListener("pointerup", onUp);
-  window.addEventListener("pointercancel", onUp);
-
   $("btnAddInfo").addEventListener("click", addInfo);
   $("inInfo").addEventListener("keydown", function (e) { if (e.key === "Enter") addInfo(); });
   $("btnReady").addEventListener("click", ready);
-  $("btnSaveNow").addEventListener("click", saveNow);
   $("btnSaveReason").addEventListener("click", saveReason);
   $("btnSaveNow2").addEventListener("click", function () {
     save(); renderCompare(); toast("ほぞん したよ");
   });
   $("btnReset").addEventListener("click", resetAll);
   // 書きかけでも消えないように、打つたびに ほぞんする
-  $("inQ2").addEventListener("input", function (e) {
-    data.nowQ = e.target.value;
-    save();
-  });
-  $("selNow").addEventListener("change", function () {
-    data.nowInfoId = $("selNow").value || data.firstInfoId;
-    save();
-    renderZones();
-  });
   $("inReason").addEventListener("input", function (e) {
     data.reason = e.target.value;
     save();
@@ -869,11 +763,10 @@ function boot(skipLoad) {
   $("inNo").value = data.no || "";
   $("inTopic").value = data.topic || "";
   $("inQ").value = data.firstQ || "";
-  $("inQ2").value = data.nowQ || "";
   $("inReason").value = data.reason || "";
   renderInfoList();
   renderFirstSelect();
-  renderNowSelect();
+  renderPickList();
   numRows("numsFirst", data.firstReact);
   numRows("numsNow", data.nowReact, function () { renderCompare(); });
   marks();
